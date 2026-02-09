@@ -20,6 +20,7 @@
     "isolatedModules": true
   },
   "include": ["src/**/*.ts"],
+  "exclude": ["src/**/*.spec.ts", "src/**/*.test.ts"],
   "references": [
     {
       "path": "../shared-types/tsconfig.lib.json"
