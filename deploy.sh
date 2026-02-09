@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Chemist2U Deployment Script for DigitalOcean
-# Run this script on your droplet as appuser
+# Run this script on your droplet as root
 
 set -e  # Exit on error
 
@@ -29,15 +29,15 @@ print_warning() {
     echo -e "${YELLOW}⚠ $1${NC}"
 }
 
-# Check if running as appuser
-if [ "$USER" != "appuser" ]; then
-    print_warning "This script should be run as appuser, not root"
-    echo "Switch to appuser first: su - appuser"
+# Check if running as root
+if [ "$USER" != "root" ]; then
+    print_warning "This script should be run as root, not root"
+    echo "Switch to root first: su - root"
     exit 1
 fi
 
 # Check if in correct directory
-REQUIRED_DIR="/home/appuser/apps/chemist2u"
+REQUIRED_DIR="/home/root/apps/chemist2u"
 if [ "$PWD" != "$REQUIRED_DIR" ]; then
     print_error "Please run this script from: $REQUIRED_DIR"
     echo "Current directory: $PWD"
