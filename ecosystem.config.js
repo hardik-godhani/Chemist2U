@@ -13,7 +13,7 @@ module.exports = {
       // For IP-based access: 'http://YOUR_DROPLET_IP'
       // For domain: 'https://yourdomain.com' (use https when SSL is configured)
       // For multiple origins: separate with commas
-      CORS_ORIGIN: process.env.CORS_ORIGIN || 'http://170.64.166.2:4200',
+      CORS_ORIGIN: process.env.CORS_ORIGIN || 'http://170.64.166.2',
       RATE_LIMIT_MAX: process.env.RATE_LIMIT_MAX || 100,
       RATE_LIMIT_WINDOW: process.env.RATE_LIMIT_WINDOW || 60000,
       // Additional rate limits for specific endpoints
@@ -38,7 +38,7 @@ module.exports = {
     // Environment-specific overrides
     env_development: {
       NODE_ENV: 'development',
-      CORS_ORIGIN: 'http://170.64.166.2:4200'
+      CORS_ORIGIN: 'http://localhost:4200'
     },
     env_production: {
       NODE_ENV: 'production',

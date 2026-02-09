@@ -31,18 +31,12 @@ print_warning() {
 
 # Check if running as root
 if [ "$USER" != "root" ]; then
-    print_warning "This script should be run as root, not root"
+    print_warning "This script should be run as root"
     echo "Switch to root first: su - root"
     exit 1
 fi
 
-# Check if in correct directory
-REQUIRED_DIR="/home/root/apps/chemist2u"
-if [ "$PWD" != "$REQUIRED_DIR" ]; then
-    print_error "Please run this script from: $REQUIRED_DIR"
-    echo "Current directory: $PWD"
-    exit 1
-fi
+# No directory check - can run from anywhere in the project
 
 echo "Step 1: Checking system requirements..."
 
