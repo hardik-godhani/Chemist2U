@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: '/api', // Use relative URL in production
+  apiUrl: 'http://170.64.166.2:3000/api',
 };
