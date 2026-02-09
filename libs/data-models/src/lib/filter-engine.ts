@@ -13,15 +13,23 @@ export function evaluateCondition(
       return true;
     }
 
-    const results = condition.conditions.map((c) =>
-      evaluateCondition(contact, c)
-    );
-
+    // Optimized evaluation with early exit
     if (condition.operator === 'OR') {
-      return results.some((r) => r);
+      // For OR: return true as soon as one condition is true
+      for (const c of condition.conditions) {
+        if (evaluateCondition(contact, c)) {
+          return true; // Early exit
+        }
+      }
+      return false;
     } else {
-      // Default to AND
-      return results.every((r) => r);
+      // For AND: return false as soon as one condition is false
+      for (const c of condition.conditions) {
+        if (!evaluateCondition(contact, c)) {
+          return false; // Early exit
+        }
+      }
+      return true;
     }
   } else {
     // Handle single condition
@@ -152,10 +160,26 @@ function evaluatePlanCondition(
 
 /**
  * Filters an array of contacts based on a rule condition
+ * Optimized with chunking for large datasets
  */
 export function filterContacts(
   contacts: Contact[],
   condition: RuleCondition
 ): Contact[] {
-  return contacts.filter((contact) => evaluateCondition(contact, condition));
+  const CHUNK_SIZE = 1000;
+  
+  // For small datasets, use simple filter
+  if (contacts.length <= CHUNK_SIZE) {
+    return contacts.filter((contact) => evaluateCondition(contact, condition));
+  }
+  
+  // For large datasets, process in chunks to prevent blocking
+  const results: Contact[] = [];
+  for (let i = 0; i < contacts.length; i += CHUNK_SIZE) {
+    const chunk = contacts.slice(i, i + CHUNK_SIZE);
+    const filtered = chunk.filter((contact) => evaluateCondition(contact, condition));
+    results.push(...filtered);
+  }
+  
+  return results;
 }

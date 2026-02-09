@@ -11,12 +11,13 @@ import {
   GetFieldsResponse,
   FieldOperator,
 } from '@temp-nx/shared-types';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class RuleService {
-  private apiUrl = 'http://localhost:3000/api';
+  private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient) {}
 

@@ -8,7 +8,11 @@
     "start:backend": "nx serve backend",
     "build": "nx run-many --target=build --projects=backend,frontend",
     "build:frontend": "nx build frontend",
-    "build:backend": "nx build backend"
+    "build:backend": "nx build backend",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:ui": "vitest --ui"
   },
   "private": true,
   "devDependencies": {
@@ -30,8 +34,13 @@
     "@swc-node/register": "~1.9.1",
     "@swc/core": "~1.5.7",
     "@swc/helpers": "~0.5.11",
+    "@types/dompurify": "^3.0.5",
+    "@types/lodash-es": "^4.17.12",
     "@types/node": "20.19.9",
+    "@types/supertest": "^6.0.3",
+    "@types/validator": "^13.15.10",
     "@typescript-eslint/utils": "^8.40.0",
+    "@vitest/ui": "^4.0.18",
     "angular-eslint": "^21.0.1",
     "autoprefixer": "^10.4.24",
     "esbuild": "^0.19.2",
@@ -40,10 +49,12 @@
     "nx": "22.4.4",
     "postcss": "^8.5.6",
     "prettier": "~3.6.2",
+    "supertest": "^7.2.2",
     "tailwindcss": "^3.4.19",
     "tslib": "^2.3.0",
     "typescript": "~5.9.2",
-    "typescript-eslint": "^8.40.0"
+    "typescript-eslint": "^8.40.0",
+    "vitest": "^4.0.18"
   },
   "workspaces": [
     "packages/*",
@@ -62,10 +73,12 @@
     "@angular/router": "~21.1.0",
     "@fastify/autoload": "~6.0.3",
     "@fastify/cors": "^11.2.0",
+    "@fastify/rate-limit": "^10.3.0",
     "@fastify/sensible": "~6.0.2",
     "dotenv": "^17.2.4",
     "fastify": "~5.2.1",
     "fastify-plugin": "~5.0.1",
-    "rxjs": "~7.8.0"
+    "rxjs": "~7.8.0",
+    "validator": "^13.15.26"
   }
 }

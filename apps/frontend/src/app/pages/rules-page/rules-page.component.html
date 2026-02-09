@@ -41,6 +41,32 @@
             <mat-icon matPrefix>label</mat-icon>
           </mat-form-field>
 
+          <!-- Validation Errors -->
+          <div *ngIf="validationResult && validationResult.errors.length > 0" class="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+            <div class="flex items-start gap-2">
+              <mat-icon class="text-red-600 text-xl">error</mat-icon>
+              <div class="flex-1">
+                <h4 class="text-sm font-semibold text-red-800 m-0 mb-2">Validation Errors</h4>
+                <ul class="list-disc list-inside text-xs text-red-700 space-y-1 m-0">
+                  <li *ngFor="let error of validationResult.errors">{{ error }}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Validation Warnings -->
+          <div *ngIf="validationResult && validationResult.warnings.length > 0" class="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+            <div class="flex items-start gap-2">
+              <mat-icon class="text-yellow-600 text-xl">warning</mat-icon>
+              <div class="flex-1">
+                <h4 class="text-sm font-semibold text-yellow-800 m-0 mb-2">Warnings</h4>
+                <ul class="list-disc list-inside text-xs text-yellow-700 space-y-1 m-0">
+                  <li *ngFor="let warning of validationResult.warnings">{{ warning }}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
           <!-- Rule Builder -->
           <div class="mb-4 sm:mb-6">
             <label class="block text-sm font-medium text-gray-700 mb-2 sm:mb-3">

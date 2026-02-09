@@ -2,9 +2,11 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, debounceTime } from 'rxjs';
+import DOMPurify from 'dompurify';
+import { cloneDeep } from 'lodash-es';
 import { RuleService } from '../../services/rule.service';
 import { RuleStateService } from '../../services/rule-state.service';
-import { RuleCondition, FieldOperator, Rule } from '@temp-nx/shared-types';
+import { RuleCondition, FieldOperator, Rule, validateRuleCondition, ValidationResult } from '@temp-nx/shared-types';
 import { RuleGroupComponent } from '../../components/rule-group/rule-group.component';
 
 // Angular Material Imports
@@ -60,6 +62,8 @@ export class RulesPageComponent implements OnInit {
   totalContacts = 0;
   previewLoading = false;
 
+  validationResult: ValidationResult | null = null;
+
   private conditionChange$ = new Subject<void>();
 
   constructor(
@@ -95,6 +99,10 @@ export class RulesPageComponent implements OnInit {
 
   onConditionChange() {
     this.ruleStateService.setCurrentCondition(this.currentCondition);
+    
+    // Validate the condition
+    this.validationResult = validateRuleCondition(this.currentCondition);
+    
     this.conditionChange$.next();
     this.cdr.detectChanges();
   }
@@ -136,8 +144,63 @@ export class RulesPageComponent implements OnInit {
     });
   }
 
+  /**
+   * Sanitize rule name and condition values
+   */
+  private sanitizeRuleData(name: string, condition: RuleCondition): { name: string; condition: RuleCondition } {
+    // Sanitize rule name
+    const sanitizedName = DOMPurify.sanitize(name.trim(), { ALLOWED_TAGS: [] });
+    
+    // Sanitize condition recursively
+    const sanitizedCondition = this.sanitizeCondition(condition);
+    
+    return { name: sanitizedName, condition: sanitizedCondition };
+  }
+
+  /**
+   * Recursively sanitize condition values
+   */
+  private sanitizeCondition(condition: RuleCondition): RuleCondition {
+    if (condition.type === 'group') {
+      return {
+        ...condition,
+        conditions: condition.conditions?.map(c => this.sanitizeCondition(c)) || [],
+      };
+    } else {
+      // Sanitize text values
+      let sanitizedValue = condition.value;
+      if (typeof sanitizedValue === 'string') {
+        sanitizedValue = DOMPurify.sanitize(sanitizedValue.trim(), { ALLOWED_TAGS: [] });
+      }
+      
+      return {
+        ...condition,
+        value: sanitizedValue,
+      };
+    }
+  }
+
   saveRule() {
     if (!this.ruleName) {
+      this.saveSuccess = false;
+      this.saveMessage = 'Rule name is required';
+      return;
+    }
+
+    // Validate the condition
+    const validation = validateRuleCondition(this.currentCondition);
+    if (!validation.valid) {
+      this.saveSuccess = false;
+      this.saveMessage = 'Cannot save rule: ' + validation.errors.join('; ');
+      return;
+    }
+
+    // Sanitize inputs
+    const { name, condition } = this.sanitizeRuleData(this.ruleName, this.currentCondition);
+    
+    if (name.length === 0 || name.length > 100) {
+      this.saveSuccess = false;
+      this.saveMessage = 'Rule name must be between 1 and 100 characters';
       return;
     }
 
@@ -149,7 +212,7 @@ export class RulesPageComponent implements OnInit {
       // Update existing rule
       this.ruleService.deleteRule(this.editingRule.id).subscribe({
         next: () => {
-          this.ruleService.saveRule(this.ruleName, this.currentCondition).subscribe({
+          this.ruleService.saveRule(name, condition).subscribe({
             next: () => {
               this.saveSuccess = true;
               this.saveMessage = `Rule "${this.ruleName}" updated successfully!`;
@@ -174,7 +237,7 @@ export class RulesPageComponent implements OnInit {
       });
     } else {
       // Create new rule
-      this.ruleService.saveRule(this.ruleName, this.currentCondition).subscribe({
+      this.ruleService.saveRule(name, condition).subscribe({
         next: () => {
           this.saveSuccess = true;
           this.saveMessage = `Rule "${this.ruleName}" saved successfully!`;
@@ -205,7 +268,8 @@ export class RulesPageComponent implements OnInit {
   editRule(rule: Rule) {
     this.editingRule = rule;
     this.ruleName = rule.name;
-    this.currentCondition = JSON.parse(JSON.stringify(rule.condition));
+    // Use lodash cloneDeep for efficient deep cloning
+    this.currentCondition = cloneDeep(rule.condition);
     this.ruleStateService.setCurrentCondition(this.currentCondition);
     this.evaluateRule();
     this.cdr.detectChanges();
