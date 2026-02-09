@@ -15,7 +15,7 @@ const server = Fastify({
 
 // Register plugins
 server.register(cors, {
-  origin: process.env.NODE_ENV === 'production' ? corsOrigin : true,
+  origin: true,
 });
 
 // Register rate limiting
