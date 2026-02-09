@@ -1,298 +1,468 @@
-# Audience Rule Builder
+# 🎯 Audience Rule Builder - Full Stack Application
 
-A full-stack application for creating complex audience segments using nested conditions and logical operators. Built with Angular 19+, Fastify, and NX monorepo.
+> A powerful full-stack application for creating complex audience segments using nested conditions and logical operators. Built with Angular 19+, Fastify, and NX monorepo.
+
+**Status**: ✅ Production Ready  
+**Version**: 1.0.0  
+**License**: MIT
+
+---
+
+## 📑 Table of Contents
+
+- [Overview](#overview)
+- [Features](#features)
+- [Architecture](#architecture)
+- [Tech Stack](#tech-stack)
+- [Quick Start](#quick-start)
+- [Installation](#installation)
+- [Project Structure](#project-structure)
+- [Available Fields & Operators](#available-fields--operators)
+- [API Documentation](#api-documentation)
+- [Data Model](#data-model)
+- [Components Guide](#components-guide)
+- [Services Guide](#services-guide)
+- [Development](#development)
+- [Testing](#testing)
+- [Deployment](#deployment)
+- [Environment Variables](#environment-variables)
+- [Troubleshooting](#troubleshooting)
+- [Contributing](#contributing)
+- [FAQ](#faq)
+
+---
+
+## 🎯 Overview
+
+The **Audience Rule Builder** is a sophisticated tool that allows users to create complex audience segments using an intuitive visual interface. It combines the power of nested logical operators (AND/OR) with multiple field types to enable precise audience targeting.
+
+### Key Use Cases
+- **Audience Segmentation**: Define target audiences based on multiple criteria
+- **Rule-based Filtering**: Create complex filters with unlimited nesting depth
+- **Real-time Preview**: See matching contacts instantly as you build rules
+- **Rule Management**: Save, organize, and reuse rule configurations
+
+---
 
 ## 🚀 Features
 
-- **Visual Rule Builder**: Create complex audience rules with intuitive drag-and-drop UI
-- **Nested Logic Groups**: Support for AND/OR operators with unlimited nesting depth
-- **Live Preview**: Real-time preview of matching contacts as you build rules
-- **Rule Management**: Save, load, and delete rule configurations
-- **Rich Field Support**: Multiple field types with appropriate operators:
-  - Email (contains, does not contain)
-  - Country (is, is not)
-  - Signup Date (before, after)
-  - Purchase Count (equals, greater than, less than)
-  - Plan (is, is not)
-- **Modern UI**: Beautiful, responsive interface built with Tailwind CSS
-- **Type Safety**: Full TypeScript implementation across frontend and backend
+### Core Features
+- ✨ **Visual Rule Builder**: Intuitive interface for building complex rules
+- 🎯 **Nested Logic Groups**: Support for AND/OR operators with unlimited nesting depth
+- 👁️ **Live Preview**: Real-time preview of matching contacts as you build rules
+- 💾 **Rule Management**: Save, load, edit, and delete rule configurations
+- 🔐 **Input Validation**: Comprehensive validation with helpful error messages
+- ⚠️ **Warning System**: Intelligent warnings for potentially conflicting rules
+- 📱 **Responsive Design**: Works seamlessly on desktop and tablet devices
 
-## 📋 Table of Contents
+### Field Support
+The application supports multiple field types with appropriate operators:
 
-- [Architecture](#architecture)
-- [Tech Stack](#tech-stack)
-- [Getting Started](#getting-started)
-- [Project Structure](#project-structure)
-- [Rule Data Model](#rule-data-model)
-- [API Documentation](#api-documentation)
-- [Development](#development)
-- [Future Improvements](#future-improvements)
+| Field | Type | Operators | Examples |
+|-------|------|-----------|----------|
+| **Email** | Text | contains, does not contain | Contains "gmail.com" |
+| **Country** | Select | is, is not | is United States |
+| **Signup Date** | Date | before, after | after 2024-01-01 |
+| **Purchase Count** | Number | equals, greater than, less than | greater than 5 |
+| **Plan** | Select | is, is not | is premium |
 
-## 🏗 Architecture
+### Advanced Features
+- 🔒 **Security**: Input sanitization and rate limiting
+- 📊 **Performance**: Optimized filtering with early exit strategy
+- 🧪 **Testing**: Comprehensive unit tests for core logic
+- 📝 **Type Safety**: Full TypeScript implementation
+- 🔄 **State Management**: RxJS-based state management with debounced updates
+- 🌐 **CORS Enabled**: Ready for production deployment
+- 📈 **Health Monitoring**: Built-in health check endpoint
+
+---
+
+## 🏗️ Architecture
+
+### System Architecture
 
 ```
-┌─────────────────┐         HTTP API          ┌─────────────────┐
-│   Angular 19    │ ◄────────────────────────► │    Fastify      │
-│    Frontend     │    (JSON Rule Objects)     │     Backend     │
-└─────────────────┘                            └─────────────────┘
-        │                                              │
-        │                                              │
-        ▼                                              ▼
-┌─────────────────┐                          ┌─────────────────┐
-│  Shared Types   │ ◄────────────────────────► │  Data Models    │
-│   Library       │      (TypeScript)          │    Library      │
-└─────────────────┘                            └─────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│                     CLIENT (Browser)                         │
+│                                                               │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │              Angular 19 Frontend                       │  │
+│  │                                                        │  │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌────────────┐  │  │
+│  │  │  Rule Page   │  │  Rule Builder│  │  Navbar    │  │  │
+│  │  │  Components  │  │  Components  │  │            │  │  │
+│  │  └──────────────┘  └──────────────┘  └────────────┘  │  │
+│  │                                                        │  │
+│  │  ┌──────────────────────────────────────────────────┐ │  │
+│  │  │          Services (HTTP, State Management)       │ │  │
+│  │  │  - RuleService (API communication)              │ │  │
+│  │  │  - RuleStateService (State management)          │ │  │
+│  │  └──────────────────────────────────────────────────┘ │  │
+│  └────────────────────────────────────────────────────────┘  │
+│                           ▼ HTTP                              │
+└──────────────────────────────────────────────────────────────┘
+                             │
+                (JSON API - RESTful)
+                             │
+┌──────────────────────────────────────────────────────────────┐
+│                  SERVER (Node.js)                            │
+│                                                               │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │              Fastify Backend                           │  │
+│  │                                                        │  │
+│  │  ┌─────────────┐  ┌─────────────┐  ┌──────────────┐  │  │
+│  │  │ Route:      │  │ Route:      │  │ Route:       │  │  │
+│  │  │ /evaluate   │  │ /rules      │  │ /fields      │  │  │
+│  │  └─────────────┘  └─────────────┘  └──────────────┘  │  │
+│  │                                                        │  │
+│  │  ┌────────────────────────────────────────────────────┤  │
+│  │  │              Core Services                         │  │
+│  │  │  - Rule Validator (validateRuleCondition)         │  │
+│  │  │  - Filter Engine (evaluateCondition)              │  │
+│  │  │  - Storage (In-Memory)                            │  │
+│  │  └────────────────────────────────────────────────────┤  │
+│  │                                                        │  │
+│  │  ┌────────────────────────────────────────────────────┤  │
+│  │  │              Data Layer                            │  │  
+│  │  │  - Sample Contacts (100 contacts)                 │  │  
+│  │  └────────────────────────────────────────────────────┤  │
+│  └────────────────────────────────────────────────────────┘  │
+└──────────────────────────────────────────────────────────────┘
+                             ▼
+                    Shared Libraries
+                             │
+        ┌────────────────────┴────────────────────┐
+        │                                         │
+   ┌────────────────────┐         ┌──────────────────────┐
+   │ Shared Types       │         │ Data Models          │
+   │ - Interfaces       │         │ - Contact data       │
+   │ - Type definitions │         │ - Filter engine      │
+   │ - Validation       │         │ - Filtering logic    │
+   └────────────────────┘         └──────────────────────┘
 ```
 
-### Key Components
+### Data Flow
 
-**Frontend (Angular 19)**
-- `RuleBuilderComponent`: Main container orchestrating the entire UI
-- `RuleGroupComponent`: Recursive component for AND/OR logic groups
-- `RuleConditionComponent`: Single condition editor (field + operator + value)
-- `LivePreviewComponent`: Real-time display of matching contacts
-- `SavedRulesListComponent`: Manage saved rules
+1. **User builds a rule** in the UI
+2. **Frontend** sends rule condition to backend API
+3. **Backend** validates and sanitizes the rule
+4. **Filter Engine** evaluates the rule against sample contacts
+5. **Results** returned to frontend for live preview
+6. **User saves rule** to in-memory storage
+7. **Saved rules** can be loaded, edited, or deleted
 
-**Backend (Fastify)**
-- `POST /api/evaluate`: Evaluate rules and return matching contacts
-- `GET /api/rules`: List all saved rules
-- `POST /api/rules`: Save a new rule
-- `DELETE /api/rules/:id`: Delete a rule
-- `GET /api/fields`: Get available fields and operators
+---
 
-**Shared Libraries**
-- `@temp-nx/shared-types`: TypeScript interfaces shared between frontend and backend
-- `@temp-nx/data-models`: Contact data and filtering engine
+## 🛠️ Tech Stack
 
-## 🛠 Tech Stack
-
-### Frontend
-- **Angular 19**: Latest Angular with standalone components
+### Frontend Stack
+- **Angular 19**: Latest Angular framework with standalone components
+  - Reactive form handling
+  - Material UI components
+  - RxJS for reactive programming
 - **Tailwind CSS 4**: Utility-first CSS framework
-- **RxJS**: Reactive programming with debounced updates
-- **TypeScript**: Full type safety
+- **TypeScript 5+**: Static typing with strict mode
+- **Material Design**: Professional UI components
+- **DOMPurify**: HTML sanitization for security
+- **Lodash-ES**: Utility functions
 
-### Backend
-- **Fastify**: Fast and low-overhead web framework
-- **TypeScript**: Type-safe API implementation
-- **In-Memory Storage**: Simple data persistence (no database required)
+### Backend Stack
+- **Fastify**: Ultra-fast web framework for Node.js
+  - CORS support
+  - Rate limiting
+  - Request validation
+  - Excellent performance
+- **TypeScript 5+**: Type-safe backend code
+- **Validator.js**: Input validation and sanitization
+- **Node.js 18+**: Runtime environment
 
-### Monorepo
-- **NX**: Powerful build system and monorepo tools
-- **ESBuild**: Fast JavaScript bundler
-- **TypeScript Path Mapping**: Shared library imports
+### Development & Build Tools
+- **NX 22+**: Powerful monorepo management
+  - Dependency graph
+  - Affected builds
+  - Code generation
+- **Vitest**: Modern unit testing framework
+- **ESBuild**: Lightning-fast bundler
+- **ESLint**: Code quality and consistency
+- **Prettier**: Code formatting
 
-## 🚀 Getting Started
+### Infrastructure
+- **Docker**: Containerization (via nginx.conf)
+- **Nginx**: Reverse proxy and static file serving
+- **PM2**: Process manager for production (ecosystem.config.js)
+
+---
+
+## 🚀 Quick Start
 
 ### Prerequisites
+- **Node.js**: 18.0.0 or higher
+- **npm**: 9.0.0 or higher
+- **Git**: For cloning the repository
 
-- Node.js 18+ and npm
-- Git
+### 5-Minute Setup
 
-### Installation
-
-1. Clone the repository:
 ```bash
+# 1. Clone the repository
 git clone <repository-url>
 cd Chemist2U
-```
 
-2. Install dependencies:
-```bash
-npm install --legacy-peer-deps
-```
+# 2. Install dependencies
+npm install
 
-### Running the Application
-
-**Start both frontend and backend simultaneously:**
-```bash
+# 3. Start both frontend and backend
 npm start
+
+# Frontend: http://localhost:4200
+# Backend: http://localhost:3000
 ```
 
-**Or start them separately:**
+The application will be available at `http://localhost:4200` in your browser.
 
-Backend (on port 3000):
+---
+
+## 📦 Installation
+
+### Detailed Setup Instructions
+
 ```bash
+# Clone the repository
+git clone https://github.com/your-org/Chemist2U.git
+cd Chemist2U
+
+# Install all dependencies
+npm install
+
+# Verify installation
+npm run build
+
+# Run tests to ensure everything works
+npm test
+```
+
+### Install Specific Services Only
+
+```bash
+# Start frontend only
+npm run start:frontend
+
+# Start backend only
 npm run start:backend
 ```
 
-Frontend (on port 4200):
-```bash
-npm run start:frontend
-```
+---
 
-### Access the Application
-
-- **Frontend**: http://localhost:4200
-- **Backend API**: http://localhost:3000/api
-
-## 📁 Project Structure
+## 📂 Project Structure
 
 ```
 Chemist2U/
-├── apps/
-│   ├── frontend/               # Angular application
-│   │   └── src/
-│   │       ├── app/
-│   │       │   ├── components/ # UI components
-│   │       │   ├── services/   # Angular services
-│   │       │   └── app.ts      # Root component
-│   │       └── styles.css      # Tailwind styles
+├── apps/                          # Main applications
+│   ├── backend/                   # Fastify API server
+│   │   ├── src/
+│   │   │   ├── main.ts           # Server entry point
+│   │   │   └── app/
+│   │   │       ├── app.ts        # Main app plugin
+│   │   │       ├── storage.ts    # In-memory storage
+│   │   │       └── routes/
+│   │   │           ├── evaluate.ts  # POST /api/evaluate
+│   │   │           ├── rules.ts     # CRUD /api/rules
+│   │   │           └── fields.ts    # GET /api/fields
+│   │   ├── package.json
+│   │   ├── tsconfig.json
+│   │   └── README.md
 │   │
-│   └── backend/                # Fastify API server
-│       └── src/
-│           ├── app/
-│           │   ├── routes/     # API route handlers
-│           │   ├── storage.ts  # In-memory data storage
-│           │   └── app.ts      # Fastify app setup
-│           └── main.ts         # Server entry point
+│   └── frontend/                  # Angular application
+│       ├── src/
+│       │   ├── main.ts           # Angular bootstrap
+│       │   ├── index.html        # HTML entry point
+│       │   ├── styles.scss       # Global styles
+│       │   └── app/
+│       │       ├── app.ts        # Root component
+│       │       ├── app.routes.ts # Route definitions
+│       │       ├── app.config.ts # Angular config
+│       │       │
+│       │       ├── components/
+│       │       │   ├── navbar/           # Top navigation
+│       │       │   ├── rule-group/       # Recursive group container
+│       │       │   └── rule-condition/   # Single condition editor
+│       │       │
+│       │       ├── pages/
+│       │       │   ├── rules-page/       # Main rules builder page
+│       │       │   └── contacts-page/    # Contacts list page
+│       │       │
+│       │       └── services/
+│       │           ├── rule.service.ts        # HTTP API calls
+│       │           └── rule-state.service.ts # State management
+│       │
+│       ├── package.json
+│       ├── tsconfig.json
+│       └── README.md
 │
-├── libs/
-│   ├── shared-types/           # TypeScript interfaces
-│   │   └── src/
-│   │       └── lib/
-│   │           └── shared-types.ts
+├── libs/                          # Shared libraries
+│   ├── shared-types/             # TypeScript interfaces
+│   │   ├── src/lib/
+│   │   │   ├── shared-types.ts   # Core interfaces
+│   │   │   └── rule-validator.ts # Validation logic
+│   │   ├── package.json
+│   │   └── tsconfig.json
 │   │
-│   └── data-models/            # Data and business logic
-│       └── src/
-│           └── lib/
-│               ├── contacts.ts      # Sample contact data
-│               └── filter-engine.ts # Rule evaluation logic
+│   └── data-models/              # Data layer
+│       ├── src/lib/
+│       │   ├── contacts.ts       # Sample contact data
+│       │   └── filter-engine.ts  # Filtering logic
+│       ├── package.json
+│       └── tsconfig.json
 │
-├── nx.json                     # NX configuration
-├── package.json                # Dependencies and scripts
-├── tailwind.config.js          # Tailwind configuration
-└── README.md                   # This file
+├── Configuration Files
+│   ├── nx.json                   # NX configuration
+│   ├── tsconfig.base.json        # Base TypeScript config
+│   ├── package.json              # Root dependencies
+│   ├── tailwind.config.js        # Tailwind CSS config
+│   ├── postcss.config.js         # PostCSS config
+│   ├── vitest.config.ts          # Test runner config
+│   ├── eslint.config.mjs         # ESLint configuration
+│   └── ecosystem.config.js       # PM2 configuration
+│
+├── Deployment Files
+│   ├── nginx.conf                # Nginx configuration
+│   ├── deploy.sh                 # Deployment script
+│   ├── server-setup.sh           # Server setup script
+│   ├── logrotate-chemist2u.conf  # Log rotation
+│   └── QUICKSTART.md             # Quick deployment guide
+│
+└── Documentation
+    ├── README.md                 # Main documentation
+    └── QUICKSTART.md             # Quick start guide
 ```
 
-## 📊 Rule Data Model
+---
 
-Rules are represented as a tree structure with two types of nodes:
+## 🎯 Available Fields & Operators
 
-### Rule Structure
+### Field Configuration Reference
 
-```typescript
-interface Rule {
-  id: string;
-  name: string;
-  condition: RuleCondition;
-  createdAt?: string;
-  updatedAt?: string;
-}
+The application comes pre-configured with the following fields and operators:
+
+#### 1. **Email Field**
+- **Type**: Text input
+- **Operators**: 
+  - `contains` - Email address contains text
+  - `doesNotContain` - Email address does not contain text
+- **Example**: Email contains "@gmail.com"
+
+#### 2. **Country Field**
+- **Type**: Select dropdown
+- **Operators**:
+  - `is` - Country equals exact value
+  - `isNot` - Country does not equal value
+- **Available Options**: 
+  - United States, United Kingdom, Germany, France, Spain, Italy
+  - Canada, Australia, Japan, India, Brazil, Mexico
+  - Netherlands, Sweden, Norway
+- **Example**: Country is Germany
+
+#### 3. **Signup Date Field**
+- **Type**: Date picker
+- **Operators**:
+  - `before` - Signup date is before specified date
+  - `after` - Signup date is after specified date
+- **Format**: ISO 8601 (YYYY-MM-DD)
+- **Example**: Signup Date after 2024-01-01
+
+#### 4. **Purchase Count Field**
+- **Type**: Number input
+- **Operators**:
+  - `equals` - Purchase count equals exact value
+  - `greaterThan` - Purchase count is greater than value
+  - `lessThan` - Purchase count is less than value
+- **Example**: Purchase Count greater than 5
+
+#### 5. **Plan Field**
+- **Type**: Select dropdown
+- **Operators**:
+  - `is` - Plan equals exact value
+  - `isNot` - Plan does not equal value
+- **Available Options**: free, basic, premium, enterprise
+- **Example**: Plan is premium
+
+---
+
+## 🔌 API Documentation
+
+### Base URL
+- **Development**: `http://localhost:3000`
+- **Production**: Configure via environment variables
+
+### Endpoints
+
+#### 1. Health Check
+```
+GET /api/health
 ```
 
-### Condition Types
+**Description**: Check server health and uptime
 
-**Group (AND/OR logic):**
-```typescript
-{
-  type: 'group',
-  operator: 'AND' | 'OR',
-  conditions: RuleCondition[]  // Nested conditions
-}
-```
-
-**Single Condition:**
-```typescript
-{
-  type: 'condition',
-  field: string,      // e.g., 'email', 'country'
-  comparison: string, // e.g., 'contains', 'is'
-  value: any         // The value to compare against
-}
-```
-
-### Example Rule
-
-"Users where (country is Germany AND plan is premium) OR (signupDate before 2024-01-01 AND purchaseCount greater than 5)"
-
+**Response** (200 OK):
 ```json
 {
-  "id": "rule-123",
-  "name": "Premium German Users or Early Adopters",
+  "status": "healthy",
+  "timestamp": "2024-01-15T10:30:00.000Z",
+  "uptime": {
+    "seconds": 3600,
+    "formatted": "1h 0m 0s"
+  },
+  "memory": {
+    "rss": "64MB",
+    "heapUsed": "48MB",
+    "heapTotal": "128MB"
+  },
+  "environment": "development"
+}
+```
+
+#### 2. Evaluate Rule
+```
+POST /api/evaluate
+```
+
+**Description**: Evaluate a rule against sample contacts and return matches
+
+**Request Body**:
+```json
+{
   "condition": {
     "type": "group",
-    "operator": "OR",
+    "operator": "AND",
     "conditions": [
       {
-        "type": "group",
-        "operator": "AND",
-        "conditions": [
-          {
-            "type": "condition",
-            "field": "country",
-            "comparison": "is",
-            "value": "Germany"
-          },
-          {
-            "type": "condition",
-            "field": "plan",
-            "comparison": "is",
-            "value": "premium"
-          }
-        ]
+        "type": "condition",
+        "field": "country",
+        "comparison": "is",
+        "value": "United States"
       },
       {
-        "type": "group",
-        "operator": "AND",
-        "conditions": [
-          {
-            "type": "condition",
-            "field": "signupDate",
-            "comparison": "before",
-            "value": "2024-01-01"
-          },
-          {
-            "type": "condition",
-            "field": "purchaseCount",
-            "comparison": "greaterThan",
-            "value": 5
-          }
-        ]
+        "type": "condition",
+        "field": "plan",
+        "comparison": "is",
+        "value": "premium"
       }
     ]
   }
 }
 ```
 
-## 🔌 API Documentation
-
-### Base URL
-```
-http://localhost:3000/api
-```
-
-### Endpoints
-
-#### 1. Evaluate Rule
-Evaluate a rule and get matching contacts.
-
-**Request:**
-```http
-POST /api/evaluate
-Content-Type: application/json
-
-{
-  "condition": {
-    "type": "group",
-    "operator": "AND",
-    "conditions": [...]
-  }
-}
-```
-
-**Response:**
+**Response** (200 OK):
 ```json
 {
   "matchCount": 15,
   "matches": [
     {
       "id": "1",
-      "name": "Emma Schmidt",
-      "email": "emma.schmidt@email.de",
-      "country": "Germany",
-      "signupDate": "2023-08-15",
-      "purchaseCount": 5,
+      "name": "John Smith",
+      "email": "john.smith@email.com",
+      "country": "United States",
+      "signupDate": "2022-03-20",
+      "purchaseCount": 12,
       "plan": "premium"
     }
   ],
@@ -300,84 +470,14 @@ Content-Type: application/json
 }
 ```
 
-#### 2. List Rules
-Get all saved rules.
-
-**Request:**
-```http
-GET /api/rules
+#### 3. Get Available Fields
 ```
-
-**Response:**
-```json
-{
-  "rules": [
-    {
-      "id": "rule-123",
-      "name": "Premium German Users",
-      "condition": {...},
-      "createdAt": "2024-01-15T10:30:00Z",
-      "updatedAt": "2024-01-15T10:30:00Z"
-    }
-  ]
-}
-```
-
-#### 3. Save Rule
-Save a new rule.
-
-**Request:**
-```http
-POST /api/rules
-Content-Type: application/json
-
-{
-  "name": "Premium German Users",
-  "condition": {
-    "type": "group",
-    "operator": "AND",
-    "conditions": [...]
-  }
-}
-```
-
-**Response:**
-```json
-{
-  "rule": {
-    "id": "rule-123",
-    "name": "Premium German Users",
-    "condition": {...},
-    "createdAt": "2024-01-15T10:30:00Z",
-    "updatedAt": "2024-01-15T10:30:00Z"
-  }
-}
-```
-
-#### 4. Delete Rule
-Delete a saved rule.
-
-**Request:**
-```http
-DELETE /api/rules/:id
-```
-
-**Response:**
-```json
-{
-  "success": true
-}
-```
-
-#### 5. Get Fields
-Get available fields and their operators.
-
-**Request:**
-```http
 GET /api/fields
 ```
 
-**Response:**
+**Description**: Get list of available fields and their operators
+
+**Response** (200 OK):
 ```json
 {
   "fields": [
@@ -394,79 +494,363 @@ GET /api/fields
 }
 ```
 
-## 💻 Development
-
-### Building for Production
-
-Build both apps:
-```bash
-npm run build
+#### 4. List Saved Rules
+```
+GET /api/rules
 ```
 
-Build individually:
-```bash
-npm run build:frontend
-npm run build:backend
+**Description**: Get all saved rules
+
+**Response** (200 OK):
+```json
+{
+  "rules": [
+    {
+      "id": "rule-1705328400000-abc123",
+      "name": "Premium US Users",
+      "condition": {
+        "type": "group",
+        "operator": "AND",
+        "conditions": []
+      }
+    }
+  ]
+}
 ```
 
-Output locations:
-- Frontend: `dist/apps/frontend/`
-- Backend: `dist/apps/backend/`
-
-### Running Production Build
-
-Backend:
-```bash
-node dist/apps/backend/main.js
+#### 5. Save Rule
+```
+POST /api/rules
 ```
 
-Frontend (serve static files with your preferred web server)
+**Description**: Create and save a new rule
 
-### Code Quality
+**Request Body**:
+```json
+{
+  "name": "Premium US Users",
+  "condition": {
+    "type": "group",
+    "operator": "AND",
+    "conditions": []
+  }
+}
+```
 
-The project includes:
-- ESLint for code linting
-- Prettier for code formatting
-- TypeScript strict mode
-- Angular best practices
+**Response** (201 Created):
+```json
+{
+  "rule": {
+    "id": "rule-1705328400000-abc123",
+    "name": "Premium US Users",
+    "condition": {}
+  }
+}
+```
 
-## 🎯 Future Improvements
+#### 6. Delete Rule
+```
+DELETE /api/rules/:id
+```
 
-### Short Term
-- **Drag-and-drop reordering** of conditions within groups
-- **More operators**: regex matching, range operators, isEmpty/isNotEmpty
-- **Rule validation**: Detect incomplete or conflicting conditions
-- **Export rules**: Generate SQL queries, MongoDB filters, or other formats
-- **Keyboard shortcuts**: Power user navigation and editing
+**Description**: Delete a saved rule by ID
 
-### Medium Term
-- **Persistent database**: PostgreSQL or MongoDB for data storage
-- **Bulk operations**: Import/export contacts in CSV/JSON
-- **Rule templates**: Pre-built common audience segments
-- **Performance optimization**: Handle 10K+ contacts efficiently
-- **Advanced preview**: Pagination, sorting, filtering in preview
-- **Rule comparison**: Visual diff between rule versions
+**Response** (200 OK):
+```json
+{
+  "success": true
+}
+```
 
-### Long Term
-- **User authentication**: Multi-user support with permissions
-- **Rule sharing**: Collaborate on audience definitions
-- **A/B testing integration**: Test rules before applying
-- **Real-time collaboration**: Multiple users editing simultaneously
-- **Audit logging**: Track who changed what and when
-- **API rate limiting**: Production-ready security
-- **Deployment automation**: CI/CD pipelines
-- **Analytics dashboard**: Rule usage statistics and insights
-- **Machine learning**: Suggest optimal rules based on data patterns
-- **Multi-tenant support**: Isolated data per organization
+### Rate Limiting
 
-## 📝 License
+The API includes rate limiting to prevent abuse:
 
-MIT
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+| Endpoint | Limit | Window |
+|----------|-------|--------|
+| `/evaluate` | 30 requests | 1 minute |
+| `/rules` (GET) | 60 requests | 1 minute |
+| `/rules` (POST/DELETE) | 10 requests | 1 minute |
+| `/fields` | 60 requests | 1 minute |
 
 ---
 
-**Built with ❤️ using NX, Angular 19, Fastify, and Tailwind CSS**
+## 📊 Data Model
+
+### Contact Interface
+
+```typescript
+interface Contact {
+  id: string;              // Unique identifier
+  name: string;            // User's full name
+  email: string;           // Email address
+  country: string;         // Country of residence
+  signupDate: string;      // ISO 8601 date string (YYYY-MM-DD)
+  purchaseCount: number;   // Total purchases made
+  plan: 'free' | 'basic' | 'premium' | 'enterprise';
+}
+```
+
+### Rule Condition Structure
+
+```typescript
+interface RuleCondition {
+  type: 'group' | 'condition';
+  
+  // For groups
+  operator?: 'AND' | 'OR';
+  conditions?: RuleCondition[];
+  
+  // For single conditions
+  field?: string;           // e.g., 'email', 'country'
+  comparison?: string;      // e.g., 'contains', 'is', 'after'
+  value?: any;             // The value to compare
+}
+```
+
+### Rule Object
+
+```typescript
+interface Rule {
+  id: string;              // Unique rule identifier
+  name: string;            // User-friendly rule name
+  condition: RuleCondition;// The rule condition
+  createdAt?: string;      // Creation timestamp
+  updatedAt?: string;      // Last update timestamp
+}
+```
+
+---
+
+## 🧩 Components Guide
+
+### Frontend Components
+
+#### 1. **RulesPageComponent**
+**Location**: `apps/frontend/src/app/pages/rules-page/`
+
+**Purpose**: Main container for the entire rule builder
+
+**Features**:
+- Rule builder interface
+- Live preview of matches
+- Rule management (save/load)
+- Validation and error display
+
+#### 2. **RuleGroupComponent**
+**Location**: `apps/frontend/src/app/components/rule-group/`
+
+**Purpose**: Recursive component for handling AND/OR groups
+
+**Features**:
+- Recursive rendering for nested groups
+- Add/remove conditions
+- Toggle AND/OR operator
+
+#### 3. **RuleConditionComponent**
+**Location**: `apps/frontend/src/app/components/rule-condition/`
+
+**Purpose**: Editor for a single condition
+
+**Features**:
+- Field selector with dynamic operators
+- Appropriate input types based on field type
+- Date picker for date fields
+- Value validation
+
+---
+
+## 🔧 Services Guide
+
+### RuleService
+**Location**: `apps/frontend/src/app/services/rule.service.ts`
+
+**Purpose**: HTTP client for backend API communication
+
+**Key Methods**:
+- `evaluateRule(condition)` - Evaluate a rule
+- `getRules()` - Get all saved rules
+- `saveRule(name, condition)` - Save a rule
+- `deleteRule(id)` - Delete a rule
+- `getFields()` - Get available fields
+
+### RuleStateService
+**Location**: `apps/frontend/src/app/services/rule-state.service.ts`
+
+**Purpose**: Manages application state using RxJS
+
+**Key Methods**:
+- `setCurrentCondition(condition)` - Set current rule
+- `getCurrentCondition()` - Get current rule
+- `setFields(fields)` - Set available fields
+- `getFields()` - Get available fields
+- `resetCondition()` - Reset to empty rule
+
+---
+
+## 💻 Development
+
+### Development Server Setup
+
+```bash
+# Start both frontend and backend
+npm start
+
+# Or start separately
+npm run start:frontend  # Port 4200
+npm run start:backend   # Port 3000
+
+# Watch mode for development
+npm run test:watch
+```
+
+### Code Quality
+
+```bash
+# Run linter
+npm run lint
+
+# Format code
+npm run format
+
+# Run tests
+npm test
+
+# Test coverage
+npm run test:coverage
+```
+
+### Building for Production
+
+```bash
+# Build all apps
+npm run build
+
+# Build frontend only
+npm run build:frontend
+
+# Build backend only
+npm run build:backend
+```
+
+---
+
+## 🧪 Testing
+
+### Test Commands
+
+```bash
+# Run all tests
+npm test
+
+# Run tests in watch mode
+npm run test:watch
+
+# Generate coverage report
+npm run test:coverage
+
+# Run tests with UI
+npm run test:ui
+```
+
+### Test Files
+
+- `libs/shared-types/src/lib/rule-validator.spec.ts` - Rule validation tests
+- `libs/data-models/src/lib/filter-engine.spec.ts` - Filtering engine tests
+- `apps/backend/src/app/storage.spec.ts` - Storage tests
+
+---
+
+## 🚀 Deployment
+
+### Prerequisites for Deployment
+
+- Ubuntu 20+ server
+- Node.js 18+ installed
+- Nginx installed
+- SSH access to server
+
+### Quick Deployment
+
+See [QUICKSTART.md](./QUICKSTART.md) for step-by-step deployment instructions.
+
+### Deployment Commands
+
+```bash
+# Build application
+npm run build
+
+# Deploy
+./deploy.sh
+```
+
+---
+
+## 🔐 Environment Variables
+
+### Backend Environment Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `NODE_ENV` | development | Environment mode |
+| `HOST` | 0.0.0.0 | Server host address |
+| `PORT` | 3000 | Server port |
+| `CORS_ORIGIN` | http://localhost:4200 | CORS allowed origin |
+| `RATE_LIMIT_MAX` | 100 | Global rate limit |
+| `RATE_LIMIT_WINDOW` | 60000 | Rate limit window (ms) |
+
+---
+
+## 🆘 Troubleshooting
+
+### Common Issues
+
+#### Port already in use
+```bash
+# Find process using port
+lsof -i :3000  # For backend
+lsof -i :4200  # For frontend
+
+# Kill process
+kill -9 <PID>
+```
+
+#### CORS errors
+Check backend CORS configuration in `apps/backend/src/main.ts`
+
+#### Module not found errors
+```bash
+npm run build
+npx nx reset
+npm install
+npm start
+```
+
+#### Build fails with memory error
+```bash
+NODE_OPTIONS=--max-old-space-size=4096 npm run build
+```
+
+---
+
+## 📝 Contributing
+
+### Development Workflow
+
+1. Create a feature branch
+2. Make changes and test locally
+3. Commit with descriptive messages
+4. Push and create pull request
+
+### Code Style
+
+- Use Prettier for formatting
+- Use ESLint for linting
+- TypeScript strict mode
+- Angular best practices
+
+## 📄 License
+
+MIT License
+
+---
