@@ -1,0 +1,29 @@
+<mat-toolbar color="primary" class="shadow-md w-100">
+    <div style="display: flex; width: 100%;">
+      <div>
+        <span>Rule Builder</span>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="pl-4">
+        <a
+          mat-button
+          routerLink="/rules"
+          routerLinkActive="bg-white/20"
+          [routerLinkActiveOptions]="{exact: false}"
+          class="!text-white !text-xs sm:!text-sm !px-2 sm:!px-4"
+        >
+          <span class="hidden sm:inline">Rules</span>
+        </a>
+        <a
+          mat-button
+          routerLink="/contacts"
+          routerLinkActive="bg-white/20"
+          [routerLinkActiveOptions]="{exact: false}"
+          class="!text-white !text-xs sm:!text-sm !px-2 sm:!px-4"
+        >
+          <span class="hidden sm:inline">Contacts</span>
+        </a>
+      </nav>
+    </div>
+</mat-toolbar>

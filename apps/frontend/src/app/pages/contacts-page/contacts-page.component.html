@@ -1,0 +1,240 @@
+<div class="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+  <!-- Header -->
+  <div class="mb-4 sm:mb-6">
+    <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2 flex items-center gap-2 sm:gap-3">
+      Contacts
+    </h1>
+    <p class="text-sm sm:text-base text-gray-600">View and filter contacts using saved rules</p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
+    <!-- Filter Panel - Left Side -->
+    <div class="lg:col-span-1 order-1">
+      <mat-card class="shadow-lg lg:sticky lg:top-20">
+        <mat-card-header class="pb-3 sm:pb-4">
+          <mat-card-title class="flex items-center gap-2">
+            <span class="text-base sm:text-lg">Filters</span>
+          </mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content class="pt-3 sm:pt-4">
+          <!-- Rule Selector -->
+          <mat-form-field appearance="outline" class="w-full mb-3 sm:mb-4">
+            <mat-label>Select Rule</mat-label>
+            <mat-select
+              [(ngModel)]="selectedRuleId"
+              (ngModelChange)="applyFilter()"
+            >
+              <mat-option value="">
+                <mat-icon class="align-middle mr-2">all_inclusive</mat-icon>
+                All Contacts
+              </mat-option>
+              <mat-option *ngFor="let rule of savedRules" [value]="rule.id">
+                <mat-icon class="align-middle mr-2">rule</mat-icon>
+                {{ rule.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Clear Filter Button -->
+          <button
+            *ngIf="selectedRuleId"
+            mat-stroked-button
+            (click)="clearFilter()"
+            color="warn"
+            class="w-full"
+          >
+            <mat-icon>clear</mat-icon>
+            Clear Filter
+          </button>
+
+          <!-- Stats -->
+          <mat-divider class="my-4 sm:my-6"></mat-divider>
+          
+          <div class="space-y-3 sm:space-y-4">
+            <div class="text-center">
+              <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Showing</p>
+              <mat-chip style="background-color: #fce4ec; color: #d92050;">
+                <span class="text-xl sm:text-2xl font-bold">{{ filteredContacts.length }}</span>
+              </mat-chip>
+            </div>
+            <div class="text-center">
+              <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">Total Database</p>
+              <mat-chip class="!bg-gray-100 !text-gray-800">
+                <span class="text-base sm:text-lg font-semibold">{{ allContacts.length }}</span>
+              </mat-chip>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Contacts List/Table - Right Side -->
+    <div class="lg:col-span-3 order-2">
+      <mat-card class="shadow-lg">
+        <!-- Header -->
+        <mat-card-header class="pb-3 sm:pb-4">
+          <mat-card-title class="flex flex-col sm:flex-row sm:items-center sm:justify-between w-full gap-2">
+            <div class="flex items-center gap-2">
+              <span class="text-base sm:text-lg">{{ selectedRuleId ? 'Filtered Contacts' : 'All Contacts' }}</span>
+            </div>
+            <mat-chip class="!bg-blue-100 !text-blue-800 !text-xs sm:!text-sm">
+              {{ filteredContacts.length }} contact{{ filteredContacts.length !== 1 ? 's' : '' }}
+            </mat-chip>
+          </mat-card-title>
+        </mat-card-header>
+
+        <mat-card-content class="pt-3 sm:pt-4">
+          <!-- Loading State -->
+          <div *ngIf="loading" class="flex justify-center py-8 sm:py-12">
+            <mat-spinner diameter="40" color="primary"></mat-spinner>
+          </div>
+
+          <!-- Mobile Card View (visible on mobile only) -->
+          <div *ngIf="!loading && filteredContacts.length > 0" class="block md:hidden space-y-3">
+            <mat-card *ngFor="let contact of filteredContacts" class="shadow-sm hover:shadow-md transition-shadow">
+              <mat-card-content class="p-3">
+                <!-- Contact Header -->
+                <div class="flex items-center gap-3 mb-3">
+                  <div class="w-12 h-12 rounded-full flex items-center justify-center text-white font-semibold text-lg flex-shrink-0" style="background-color: #d92050;">
+                    {{ contact.name.charAt(0) }}
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="font-semibold text-gray-900 truncate m-0">{{ contact.name }}</p>
+                    <p class="text-sm text-gray-500 truncate m-0">{{ contact.email }}</p>
+                  </div>
+                </div>
+
+                <!-- Contact Details -->
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <p class="text-xs text-gray-500 mb-1">Country</p>
+                    <mat-chip class="!bg-gray-100 !text-xs !h-6">
+                      {{ contact.country }}
+                    </mat-chip>
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-500 mb-1">Plan</p>
+                    <mat-chip
+                      class="!text-xs !h-6"
+                      [ngClass]="{
+                        '!bg-green-100 !text-green-800': contact.plan === 'premium' || contact.plan === 'enterprise',
+                        '!bg-blue-100 !text-blue-800': contact.plan === 'basic',
+                        '!bg-gray-100 !text-gray-800': contact.plan === 'free'
+                      }"
+                    >
+                      {{ contact.plan | titlecase }}
+                    </mat-chip>
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-500 mb-1">Purchases</p>
+                    <mat-chip class="!bg-purple-100 !text-purple-800 !text-xs !h-6">
+                      {{ contact.purchaseCount }}
+                    </mat-chip>
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-500 mb-1">Joined</p>
+                    <div class="flex items-center gap-1 text-xs text-gray-600">
+                      <span>{{ formatDate(contact.signupDate) }}</span>
+                    </div>
+                  </div>
+                </div>
+              </mat-card-content>
+            </mat-card>
+          </div>
+
+          <!-- Desktop Table View (hidden on mobile) -->
+          <div *ngIf="!loading && filteredContacts.length > 0" class="hidden md:block overflow-x-auto">
+            <table mat-table [dataSource]="filteredContacts" class="w-full">
+              <!-- Avatar & Name Column -->
+              <ng-container matColumnDef="name">
+                <th mat-header-cell *matHeaderCellDef class="font-semibold">Contact</th>
+                <td mat-cell *matCellDef="let contact">
+                  <div class="flex items-center gap-3 py-2">
+                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-white font-semibold flex-shrink-0" style="background-color: #d92050;">
+                      {{ contact.name.charAt(0) }}
+                    </div>
+                    <div class="min-w-0">
+                      <p class="font-medium text-gray-900 m-0 truncate">{{ contact.name }}</p>
+                      <p class="text-sm text-gray-500 m-0 truncate">{{ contact.email }}</p>
+                    </div>
+                  </div>
+                </td>
+              </ng-container>
+
+              <!-- Country Column -->
+              <ng-container matColumnDef="country">
+                <th mat-header-cell *matHeaderCellDef class="font-semibold">Country</th>
+                <td mat-cell *matCellDef="let contact">
+                  <mat-chip class="!bg-gray-100">
+                    {{ contact.country }}
+                  </mat-chip>
+                </td>
+              </ng-container>
+
+              <!-- Plan Column -->
+              <ng-container matColumnDef="plan">
+                <th mat-header-cell *matHeaderCellDef class="font-semibold">Plan</th>
+                <td mat-cell *matCellDef="let contact">
+                  <mat-chip
+                    [ngClass]="{
+                      '!bg-green-100 !text-green-800': contact.plan === 'premium' || contact.plan === 'enterprise',
+                      '!bg-blue-100 !text-blue-800': contact.plan === 'basic',
+                      '!bg-gray-100 !text-gray-800': contact.plan === 'free'
+                    }"
+                  >
+                    {{ contact.plan | titlecase }}
+                  </mat-chip>
+                </td>
+              </ng-container>
+
+              <!-- Purchases Column -->
+              <ng-container matColumnDef="purchases">
+                <th mat-header-cell *matHeaderCellDef class="font-semibold">Purchases</th>
+                <td mat-cell *matCellDef="let contact">
+                  <mat-chip class="!bg-purple-100 !text-purple-800">
+                    {{ contact.purchaseCount }}
+                  </mat-chip>
+                </td>
+              </ng-container>
+
+              <!-- Signup Date Column -->
+              <ng-container matColumnDef="signupDate">
+                <th mat-header-cell *matHeaderCellDef class="font-semibold">Signup Date</th>
+                <td mat-cell *matCellDef="let contact">
+                  <div class="flex items-center gap-1 text-gray-600">
+                    <span>{{ formatDate(contact.signupDate) }}</span>
+                  </div>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: displayedColumns;" class="hover:bg-gray-50"></tr>
+            </table>
+          </div>
+
+          <!-- Empty State -->
+          <div
+            *ngIf="!loading && filteredContacts.length === 0"
+            class="text-center py-12 sm:py-16"
+          >
+            <mat-icon class="text-gray-300 mb-3 sm:mb-4" style="font-size: 56px; width: 56px; height: 56px;">
+              search_off
+            </mat-icon>
+            <p class="text-base sm:text-lg font-medium text-gray-700 mb-2">No contacts match this filter</p>
+            <p class="text-sm text-gray-500 mb-4">Try adjusting your filter criteria</p>
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="clearFilter()"
+              class="!text-sm sm:!text-base"
+            >
+              <mat-icon>clear_all</mat-icon>
+              Clear filter
+            </button>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,104 @@
+/**
+ * Chemist2U Brand Colors
+ * 
+ * Primary: Pink/Rose (#d92050)
+ * Text: Dark Blue (#0c344a)
+ * Accent: Purple (#9c27b0)
+ */
+
+@use '@angular/material' as mat;
+
+/* Tailwind CSS */
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@include mat.core();
+
+$chemist2u-primary: mat.m2-define-palette((
+  50: #fce4ec,
+  100: #f8bbd0,
+  200: #f48fb1,
+  300: #f06292,
+  400: #ec407a,
+  500: #d92050,
+  600: #c51c48,
+  700: #ad1840,
+  800: #961438,
+  900: #6f0f2a,
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: white,
+    400: white,
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+  )
+), 500, 300, 700);
+
+$chemist2u-accent: mat.m2-define-palette((
+  50: #f3e5f5,
+  100: #e1bee7,
+  200: #ce93d8,
+  300: #ba68c8,
+  400: #ab47bc,
+  500: #9c27b0,
+  600: #8e24aa,
+  700: #7b1fa2,
+  800: #6a1b9a,
+  900: #4a148c,
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: white,
+    400: white,
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+  )
+), 500, 300, 700);
+
+$chemist2u-warn: mat.m2-define-palette(mat.$m2-red-palette);
+
+$chemist2u-theme: mat.m2-define-light-theme((
+  color: (
+    primary: $chemist2u-primary,
+    accent: $chemist2u-accent,
+    warn: $chemist2u-warn,
+  ),
+  typography: mat.m2-define-typography-config(
+    $font-family: 'Inter, "Helvetica Neue", sans-serif',
+  ),
+  density: 0,
+));
+
+@include mat.all-component-themes($chemist2u-theme);
+
+/* Custom Chemist2U styles */
+html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, "Helvetica Neue", sans-serif;
+  color: #0c344a;
+}
+
+/* Brand colors as CSS variables */
+:root {
+  --chemist2u-primary: #d92050;
+  --chemist2u-primary-light: #f48fb1;
+  --chemist2u-primary-dark: #ad1840;
+  --chemist2u-accent: #9c27b0;
+  --chemist2u-accent-light: #ce93d8;
+  --chemist2u-accent-dark: #7b1fa2;
+  --chemist2u-text: #0c344a;
+}

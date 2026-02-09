@@ -1,0 +1,19 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compileOnSave": false,
+  "files": [],
+  "references": [
+    {
+      "path": "./apps/backend"
+    },
+    {
+      "path": "./libs/shared-types"
+    },
+    {
+      "path": "./libs/data-models"
+    },
+    {
+      "path": "./apps/frontend"
+    }
+  ]
+}

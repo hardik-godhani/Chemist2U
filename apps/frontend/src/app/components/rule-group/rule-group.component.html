@@ -1,0 +1,90 @@
+<div
+  class="border-l-4 pl-2 sm:pl-4 py-2 rounded-l"
+  [ngClass]="{
+    'border-primary bg-primary/10': group.operator === 'AND',
+    'border-purple-500 bg-purple-50/30': group.operator === 'OR'
+  }"
+  style="--primary: #d92050;"
+>
+  <!-- Group Header -->
+  <div class="flex items-center gap-1.5 sm:gap-2 mb-2 sm:mb-3 flex-wrap">
+    <!-- Operator Toggle -->
+    <mat-chip
+      (click)="toggleOperator()"
+      [highlighted]="true"
+      class="cursor-pointer hover:shadow-md transition-shadow !text-xs sm:!text-sm"
+      [style.background-color]="group.operator === 'AND' ? '#d92050' : '#d92050'"
+      [style.color]="'white'"
+    >
+      {{ group.operator }}
+    </mat-chip>
+
+    <!-- Add Buttons -->
+    <button
+      mat-stroked-button
+      (click)="addCondition()"
+      color="primary"
+      class="!text-xs !px-2 sm:!px-4"
+    >
+      <mat-icon class="!text-sm sm:!text-base">add</mat-icon>
+      <span class="hidden sm:inline">Condition</span>
+      <span class="sm:hidden">Cond.</span>
+    </button>
+
+    <button
+      mat-stroked-button
+      (click)="addGroup()"
+      color="accent"
+      class="!text-xs !px-2 sm:!px-4"
+    >
+      <mat-icon class="!text-sm sm:!text-base">create_new_folder</mat-icon>
+      <span class="hidden sm:inline">Group</span>
+      <span class="sm:hidden">Grp.</span>
+    </button>
+
+    <!-- Remove Group Button (only for nested groups) -->
+    <button
+      *ngIf="!isRoot"
+      mat-icon-button
+      (click)="onRemove()"
+      color="warn"
+      class="ml-auto"
+      matTooltip="Remove group"
+    >
+      <mat-icon>delete</mat-icon>
+    </button>
+  </div>
+
+  <!-- Conditions List -->
+  <div class="space-y-2 sm:space-y-3">
+    <ng-container *ngFor="let condition of group.conditions; let i = index">
+      <!-- Single Condition -->
+      <app-rule-condition
+        *ngIf="condition.type === 'condition'"
+        [condition]="condition"
+        [fields]="fields"
+        (conditionChange)="onConditionChange()"
+        (remove)="removeCondition(i)"
+      ></app-rule-condition>
+
+      <!-- Nested Group -->
+      <app-rule-group
+        *ngIf="condition.type === 'group'"
+        [group]="condition"
+        [fields]="fields"
+        [isRoot]="false"
+        (conditionChange)="onConditionChange()"
+        (remove)="removeCondition(i)"
+      ></app-rule-group>
+    </ng-container>
+
+    <!-- Empty State -->
+    <div
+      *ngIf="!group.conditions || group.conditions.length === 0"
+      class="text-center py-4 sm:py-6 px-3 sm:px-4 bg-white rounded-lg border-2 border-dashed border-gray-300"
+    >
+      <mat-icon class="text-gray-400 text-2xl sm:text-3xl mb-1 sm:mb-2">info</mat-icon>
+      <p class="text-xs sm:text-sm text-gray-500 m-0">No conditions yet. Click "+ Condition" or "+ Group".</p>
+    </div>
+  </div>
+</div>

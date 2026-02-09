@@ -1,0 +1,39 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "outDir": "dist",
+    "types": ["node"],
+    "rootDir": "src",
+    "tsBuildInfoFile": "dist/tsconfig.app.tsbuildinfo",
+    "baseUrl": ".",
+    "paths": {
+      "@temp-nx/shared-types": ["../../libs/shared-types/src/index.ts"],
+      "@temp-nx/data-models": ["../../libs/data-models/src/index.ts"]
+    },
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "lib": ["es2022"],
+    "target": "es2022",
+    "strict": true,
+    "skipLibCheck": true,
+    "importHelpers": true,
+    "isolatedModules": true,
+    "esModuleInterop": true
+  },
+  "include": [
+    "src/**/*.ts",
+    "../../libs/shared-types/src/**/*.ts",
+    "../../libs/data-models/src/**/*.ts"
+  ],
+  "exclude": [],
+  "references": [
+    {
+      "path": "../../libs/data-models/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared-types/tsconfig.lib.json"
+    }
+  ]
+}

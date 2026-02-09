@@ -1,0 +1,97 @@
+<div class="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-center gap-2 sm:gap-3 p-3 sm:p-4 bg-white border border-gray-200 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+  <!-- Field Selector -->
+  <mat-form-field appearance="outline" class="flex-1 min-w-full sm:min-w-[150px] !mb-0">
+    <mat-label>Field</mat-label>
+    <mat-select
+      [(ngModel)]="condition.field"
+      (ngModelChange)="onFieldChange()"
+      required
+    >
+      <mat-option *ngFor="let field of fields" [value]="field.field">
+        {{ field.label }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <!-- Operator Selector -->
+  <mat-form-field *ngIf="selectedField" appearance="outline" class="flex-1 min-w-full sm:min-w-[150px] !mb-0">
+    <mat-label>Operator</mat-label>
+    <mat-select
+      [(ngModel)]="condition.comparison"
+      (ngModelChange)="onConditionChange()"
+      required
+    >
+      <mat-option *ngFor="let op of selectedField.operators" [value]="op.value">
+        {{ op.label }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <!-- Value Input -->
+  <ng-container *ngIf="selectedField && condition.comparison">
+    <!-- Text Input -->
+    <mat-form-field *ngIf="selectedField.valueType === 'text'" appearance="outline" class="flex-1 min-w-full sm:min-w-[150px] !mb-0">
+      <mat-label>Value</mat-label>
+      <input
+        matInput
+        [(ngModel)]="condition.value"
+        (ngModelChange)="onConditionChange()"
+        placeholder="Enter value"
+        required
+      />
+    </mat-form-field>
+
+    <!-- Number Input -->
+    <mat-form-field *ngIf="selectedField.valueType === 'number'" appearance="outline" class="flex-1 min-w-full sm:min-w-[150px] !mb-0">
+      <mat-label>Value</mat-label>
+      <input
+        matInput
+        type="number"
+        [(ngModel)]="condition.value"
+        (ngModelChange)="onConditionChange()"
+        placeholder="Enter number"
+        required
+      />
+    </mat-form-field>
+
+    <!-- Date Input -->
+    <mat-form-field *ngIf="selectedField.valueType === 'date'" appearance="outline" class="flex-1 min-w-full sm:min-w-[150px] !mb-0">
+      <mat-label>Date</mat-label>
+      <input
+        matInput
+        [matDatepicker]="picker"
+        [(ngModel)]="condition.value"
+        (ngModelChange)="onConditionChange()"
+        placeholder="Select date"
+        required
+      />
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+    <!-- Select Input -->
+    <mat-form-field *ngIf="selectedField.valueType === 'select'" appearance="outline" class="flex-1 min-w-full sm:min-w-[150px] !mb-0">
+      <mat-label>Value</mat-label>
+      <mat-select
+        [(ngModel)]="condition.value"
+        (ngModelChange)="onConditionChange()"
+        required
+      >
+        <mat-option *ngFor="let option of selectedField.selectOptions" [value]="option">
+          {{ option }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+  </ng-container>
+
+  <!-- Remove Button -->
+  <button
+    mat-icon-button
+    (click)="onRemove()"
+    color="warn"
+    matTooltip="Remove condition"
+    class="flex-shrink-0 self-center sm:self-auto"
+  >
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
