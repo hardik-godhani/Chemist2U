@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: '/api', // Use relative URL - Nginx proxies to backend
+  apiUrl: 'http://170.64.166.2/api', // Use relative URL - Nginx proxies to backend
 };
